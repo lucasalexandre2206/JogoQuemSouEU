@@ -13,7 +13,7 @@ let timer;
 let resultados = [];
 let jogando = false;
 let acertos = 0;
-let bloqueado = false; // 🔥 trava contra múltiplas leituras
+let bloqueado = false;
 
 function mostrarTela(id) {
   document.querySelectorAll(".tela").forEach(t => t.style.display = "none");
@@ -28,12 +28,12 @@ function selecionarCategoria(cat) {
 
 async function iniciarJogo() {
 
-  // 🔥 Tela cheia automática
+  // 🔥 Fullscreen
   if (document.documentElement.requestFullscreen) {
     await document.documentElement.requestFullscreen();
   }
 
-  // 🔥 Tenta travar em paisagem (nem todos celulares permitem)
+  // 🔥 Tentar travar paisagem
   if (screen.orientation && screen.orientation.lock) {
     try {
       await screen.orientation.lock("landscape");
@@ -46,10 +46,12 @@ async function iniciarJogo() {
   resultados = [];
   acertos = 0;
   jogando = true;
+  bloqueado = false;
 
   mostrarTela("jogo");
   document.getElementById("tempo").innerText = tempo;
   document.getElementById("placar").innerText = acertos;
+
   mostrarPalavra();
   iniciarTimer();
 }
@@ -63,10 +65,14 @@ function mostrarPalavra() {
 }
 
 function iniciarTimer() {
+  clearInterval(timer);
   timer = setInterval(() => {
     tempo--;
     document.getElementById("tempo").innerText = tempo;
-    if (tempo <= 0) finalizar();
+
+    if (tempo <= 0) {
+      finalizar();
+    }
   }, 1000);
 }
 
@@ -79,6 +85,18 @@ function efeitoTela(classe) {
   setTimeout(() => {
     document.body.classList.remove(classe);
   }, 400);
+}
+
+function registrarResposta(status) {
+  resultados.push({ nome: palavras[indice], status });
+
+  if (status === "acertou") {
+    acertos++;
+    document.getElementById("placar").innerText = acertos;
+  }
+
+  indice++;
+  mostrarPalavra();
 }
 
 function finalizar() {
@@ -106,39 +124,38 @@ function voltarInicio() {
   mostrarTela("categorias");
 }
 
-/* 🔥 SENSOR COM BLOQUEIO */
+/* ============================= */
+/* 🔥 SENSOR CORRIGIDO PREMIUM */
+/* ============================= */
+
 window.addEventListener("deviceorientation", (event) => {
-  if (!jogando || bloqueado) return;
+  if (!jogando) return;
 
-  let beta = event.beta;
+  const gamma = event.gamma; // lado
 
-  if (beta > 45) { // ACERTOU
+  // 🔒 Se já executou ação, só libera quando voltar ao centro
+  if (bloqueado) {
+    if (Math.abs(gamma) < 10) {
+      bloqueado = false;
+    }
+    return;
+  }
+
+  // 👉 ACERTOU (direita)
+  if (gamma > 40) {
     bloqueado = true;
 
     vibrar(200);
     efeitoTela("acertouTela");
-
-    resultados.push({ nome: palavras[indice], status: "acertou" });
-    acertos++;
-    document.getElementById("placar").innerText = acertos;
-
-    indice++;
-    mostrarPalavra();
-
-    setTimeout(() => bloqueado = false, 1200); // 🔥 tempo mínimo entre ações
+    registrarResposta("acertou");
   }
 
-  if (beta < -45) { // PASSOU
+  // 👉 PASSOU (esquerda)
+  if (gamma < -40) {
     bloqueado = true;
 
     vibrar([100, 100, 100]);
     efeitoTela("passouTela");
-
-    resultados.push({ nome: palavras[indice], status: "passou" });
-
-    indice++;
-    mostrarPalavra();
-
-    setTimeout(() => bloqueado = false, 1200);
+    registrarResposta("passou");
   }
 });
