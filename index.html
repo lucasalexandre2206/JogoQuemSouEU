@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Desafio 60s</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="tela" id="categorias">
+  <h1>🎮 Desafio 60s</h1>
+  <div class="grid">
+    <button onclick="selecionarCategoria('animais')">🐶 Animais</button>
+    <button onclick="selecionarCategoria('objetos')">📦 Objetos</button>
+    <button onclick="selecionarCategoria('filmes')">🎬 Filmes</button>
+    <button onclick="selecionarCategoria('frutas')">🍎 Frutas</button>
+  </div>
+</div>
+
+<div class="tela" id="instrucao">
+  <h1 id="tema"></h1>
+  <p>Coloque o celular na testa</p>
+  <p>Você tem <strong>60 segundos</strong></p>
+  <p>⬆️ Virar para cima = Acertou</p>
+  <p>⬇️ Virar para baixo = Passar</p>
+  <button onclick="iniciarJogo()">Começar</button>
+</div>
+
+<div class="tela jogo" id="jogo">
+  <div class="topo">
+    <span id="tempo">60</span>
+    <span id="placar">0</span>
+  </div>
+  <h1 id="palavra"></h1>
+</div>
+
+<div class="tela" id="resultado">
+  <h1>Resultado</h1>
+  <h2 id="totalAcertos"></h2>
+  <div id="listaResultado"></div>
+  <button onclick="voltarInicio()">Voltar</button>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
