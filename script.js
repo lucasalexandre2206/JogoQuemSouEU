@@ -125,24 +125,24 @@ function voltarInicio() {
 }
 
 /* ============================= */
-/* 🔥 SENSOR CORRIGIDO PREMIUM */
+/* 🔥 SENSOR ESTILO APP REAL 🔥 */
 /* ============================= */
 
 window.addEventListener("deviceorientation", (event) => {
     if (!jogando) return;
 
-    const gamma = event.gamma; // lado
+    const beta = event.beta; // frente / trás
 
-    // 🔒 Se já executou ação, só libera quando voltar ao centro
+    // 🔒 Bloqueio até voltar posição neutra
     if (bloqueado) {
-        if (Math.abs(gamma) < 10) {
+        if (Math.abs(beta) < 15) {
             bloqueado = false;
         }
         return;
     }
 
-    // 👉 ACERTOU (direita)
-    if (gamma > 40) {
+    // 👉 ACERTOU (inclina PARA CIMA)
+    if (beta < -30) {
         bloqueado = true;
 
         vibrar(200);
@@ -150,42 +150,43 @@ window.addEventListener("deviceorientation", (event) => {
         registrarResposta("acertou");
     }
 
-    // 👉 PASSOU (esquerda)
-    if (gamma < -40) {
+    // 👉 PASSOU (inclina PARA BAIXO)
+    if (beta > 30) {
         bloqueado = true;
 
         vibrar([100, 100, 100]);
         efeitoTela("passouTela");
         registrarResposta("passou");
     }
+    async function finalizar() {
+    clearInterval(timer);
+    jogando = false;
 
-    // ===============================
-    // FINALIZAR
-    // ===============================
-    async function finalizarJogo() {
-        jogoAtivo = false;
-        clearInterval(intervalo);
-
-        telaJogo.style.display = "none";
-        telaResultado.style.display = "flex";
-
-        listaAcertos.innerHTML = acertadas.map(a => `<li>${a}</li>`).join("");
-        listaErros.innerHTML = erradas.map(e => `<li>${e}</li>`).join("");
-
-        // VOLTAR PARA VERTICAL
-        if (screen.orientation.unlock) {
-            screen.orientation.unlock();
-        }
-
-        if (screen.orientation.lock) {
-            try {
-                await screen.orientation.lock("portrait");
-            } catch (e) { }
-        }
-
-        // SAIR DA TELA CHEIA
-        if (document.exitFullscreen) {
-            document.exitFullscreen();
-        }
+    // 🔥 Voltar para vertical
+    if (screen.orientation && screen.orientation.lock) {
+        try {
+            await screen.orientation.lock("portrait");
+        } catch (e) {}
     }
+
+    // 🔥 Sair do fullscreen
+    if (document.exitFullscreen) {
+        document.exitFullscreen();
+    }
+
+    document.getElementById("totalAcertos").innerText =
+        "Você acertou " + acertos + " palavras!";
+
+    const lista = document.getElementById("listaResultado");
+    lista.innerHTML = "";
+
+    resultados.forEach(item => {
+        const p = document.createElement("p");
+        p.innerText = item.nome;
+        p.className = item.status;
+        lista.appendChild(p);
+    });
+
+    mostrarTela("resultado");
+}
 });
