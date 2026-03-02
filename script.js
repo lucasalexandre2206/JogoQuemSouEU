@@ -13,6 +13,7 @@ let timer;
 let resultados = [];
 let jogando = false;
 let acertos = 0;
+let bloqueado = false; // 🔥 trava contra múltiplas leituras
 
 function mostrarTela(id) {
   document.querySelectorAll(".tela").forEach(t => t.style.display = "none");
@@ -25,7 +26,20 @@ function selecionarCategoria(cat) {
   mostrarTela("instrucao");
 }
 
-function iniciarJogo() {
+async function iniciarJogo() {
+
+  // 🔥 Tela cheia automática
+  if (document.documentElement.requestFullscreen) {
+    await document.documentElement.requestFullscreen();
+  }
+
+  // 🔥 Tenta travar em paisagem (nem todos celulares permitem)
+  if (screen.orientation && screen.orientation.lock) {
+    try {
+      await screen.orientation.lock("landscape");
+    } catch (e) {}
+  }
+
   palavras = [...banco[categoriaAtual]].sort(() => Math.random() - 0.5);
   indice = 0;
   tempo = 60;
@@ -57,16 +71,14 @@ function iniciarTimer() {
 }
 
 function vibrar(ms) {
-  if (navigator.vibrate) {
-    navigator.vibrate(ms);
-  }
+  if (navigator.vibrate) navigator.vibrate(ms);
 }
 
 function efeitoTela(classe) {
   document.body.classList.add(classe);
   setTimeout(() => {
     document.body.classList.remove(classe);
-  }, 500);
+  }, 400);
 }
 
 function finalizar() {
@@ -90,16 +102,19 @@ function finalizar() {
 }
 
 function voltarInicio() {
+  if (document.exitFullscreen) document.exitFullscreen();
   mostrarTela("categorias");
 }
 
-/* SENSOR */
+/* 🔥 SENSOR COM BLOQUEIO */
 window.addEventListener("deviceorientation", (event) => {
-  if (!jogando) return;
+  if (!jogando || bloqueado) return;
 
   let beta = event.beta;
 
   if (beta > 45) { // ACERTOU
+    bloqueado = true;
+
     vibrar(200);
     efeitoTela("acertouTela");
 
@@ -109,14 +124,21 @@ window.addEventListener("deviceorientation", (event) => {
 
     indice++;
     mostrarPalavra();
+
+    setTimeout(() => bloqueado = false, 1200); // 🔥 tempo mínimo entre ações
   }
 
   if (beta < -45) { // PASSOU
+    bloqueado = true;
+
     vibrar([100, 100, 100]);
     efeitoTela("passouTela");
 
     resultados.push({ nome: palavras[indice], status: "passou" });
+
     indice++;
     mostrarPalavra();
+
+    setTimeout(() => bloqueado = false, 1200);
   }
 });
