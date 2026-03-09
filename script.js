@@ -33,11 +33,11 @@ async function iniciarJogo() {
         await document.documentElement.requestFullscreen();
     }
 
-    // 🔥 Tentar travar paisagem
+    // 🔥 Travar paisagem
     if (screen.orientation && screen.orientation.lock) {
         try {
             await screen.orientation.lock("landscape");
-        } catch (e) { }
+        } catch (e) {}
     }
 
     palavras = [...banco[categoriaAtual]].sort(() => Math.random() - 0.5);
@@ -45,15 +45,40 @@ async function iniciarJogo() {
     tempo = 60;
     resultados = [];
     acertos = 0;
-    jogando = true;
-    bloqueado = false;
+    jogando = false; // ainda não começa
 
     mostrarTela("jogo");
+
     document.getElementById("tempo").innerText = tempo;
     document.getElementById("placar").innerText = acertos;
 
-    mostrarPalavra();
-    iniciarTimer();
+    iniciarContagem();
+}
+
+function iniciarContagem() {
+    const contador = document.getElementById("contadorInicial");
+    let numero = 3;
+
+    contador.style.display = "block";
+    contador.innerText = numero;
+
+    const intervaloContagem = setInterval(() => {
+        numero--;
+        contador.innerText = numero;
+
+        contador.style.animation = "none";
+        void contador.offsetWidth; // reinicia animação
+        contador.style.animation = "zoom 1s ease";
+
+        if (numero <= 0) {
+            clearInterval(intervaloContagem);
+            contador.style.display = "none";
+
+            jogando = true; // 🔥 AGORA começa o jogo
+            mostrarPalavra();
+            iniciarTimer();
+        }
+    }, 1000);
 }
 
 function mostrarPalavra() {

@@ -3,23 +3,55 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Desafio 60s</title>
+<title>Quem Sou Eu?</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div class="tela" id="categorias">
-  <h1>🎮 Desafio 60s</h1>
-  <div class="grid">
-    <button onclick="selecionarCategoria('animais')">🐶 Animais</button>
-    <button onclick="selecionarCategoria('objetos')">📦 Objetos</button>
-    <button onclick="selecionarCategoria('filmes')">🎬 Filmes</button>
-    <button onclick="selecionarCategoria('frutas')">🍎 Frutas</button>
+<div class="tela categorias" id="categorias">
+
+  <div class="header">
+    <h1>Quem Sou EU?</h1>
   </div>
+
+  <div class="grid">
+    <button class="card amarelo" onclick="selecionarCategoria('animais')">
+      🐶
+      <span>Animais</span>
+    </button>
+
+    <button class="card azul" onclick="selecionarCategoria('objetos')">
+      📦
+      <span>Objetos</span>
+    </button>
+
+    <button class="card vermelho" onclick="selecionarCategoria('filmes')">
+      🎬
+      <span>Filmes</span>
+    </button>
+
+    <button class="card verde" onclick="selecionarCategoria('frutas')">
+      🍎
+      <span>Frutas</span>
+    </button>
+
+    <button class="card verde" onclick="selecionarCategoria('frutas')">
+      🍎
+      <span>Frutas</span>
+    </button>
+
+    <button class="card verde" onclick="selecionarCategoria('frutas')">
+      🍎
+      <span>Frutas</span>
+    </button>
+  </div>
+
 </div>
 
 <div class="tela" id="instrucao">
   <h1 id="tema"></h1>
+
+  
   <p>Coloque o celular na testa</p>
   <p>Você tem <strong>60 segundos</strong></p>
   <p>⬆️ Virar para cima = Acertou</p>
@@ -32,6 +64,9 @@
     <span id="tempo">60</span>
     <span id="placar">0</span>
   </div>
+
+  <div id="contadorInicial" class="contador"></div>
+
   <h1 id="palavra"></h1>
 </div>
 
